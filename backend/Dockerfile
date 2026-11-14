@@ -1,4 +1,4 @@
-FROM php:8.0-apache
+FROM php:8.1-apache-bookworm
 
 RUN apt-get update && apt-get install -y \
     git unzip libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libxml2-dev libzip-dev \
@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
+
+RUN printf "error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\nupload_max_filesize = 100M\npost_max_size = 100M\nmemory_limit = 256M\n" > /usr/local/etc/php/conf.d/orange.ini
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
