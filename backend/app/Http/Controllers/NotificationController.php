@@ -109,7 +109,15 @@ class NotificationController extends Controller
         $title = $request->title;
         $message  = $request->message;
       
-        GlobalFunction::sendPushNotificationToAllUsers($title, $message);
+        $pushRaw = GlobalFunction::sendPushNotificationToAllUsers($title, $message);
+        $pushResult = json_decode($pushRaw, true);
+
+        if (empty($pushResult['status'])) {
+            return response()->json([
+                'status' => false,
+                'message' => $pushResult['message'] ?? 'Failed to send push notification via FCM.',
+            ]);
+        }
 
         return response()->json([
             'status' => true,
@@ -123,7 +131,15 @@ class NotificationController extends Controller
         $title = $request->title;
         $message  = $request->message;
 
-        GlobalFunction::sendPushNotificationToAllUsers($title, $message);
+        $pushRaw = GlobalFunction::sendPushNotificationToAllUsers($title, $message);
+        $pushResult = json_decode($pushRaw, true);
+
+        if (empty($pushResult['status'])) {
+            return response()->json([
+                'status' => false,
+                'message' => $pushResult['message'] ?? 'Failed to repeat push notification via FCM.',
+            ]);
+        }
 
         return response()->json([
                 'status' => true,

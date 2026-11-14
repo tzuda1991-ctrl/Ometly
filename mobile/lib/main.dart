@@ -31,7 +31,7 @@ class MyHttpOverrides extends HttpOverrides {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  FirebaseNotificationManager.shared.showNotification(message);
+  await FirebaseNotificationManager.showBackgroundNotification(message);
 }
 
 Future<void> main() async {
@@ -50,7 +50,6 @@ Future<void> main() async {
       SessionManager.instance.getString(key: SessionKeys.languageCode) ??
           Platform.localeName.split('_')[0];
 
-  // FirebaseNotificationManager.shared;
   // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -76,6 +75,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    FirebaseNotificationManager.shared;
     consentForm();
     super.initState();
   }

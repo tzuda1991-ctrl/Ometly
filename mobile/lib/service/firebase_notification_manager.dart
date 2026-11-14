@@ -4,15 +4,17 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:orange_ui/screen/chat_screen/chat_screen_view_model.dart';
+import 'package:orange_ui/service/session_manager.dart';
 import 'package:orange_ui/utils/app_res.dart';
 import 'package:orange_ui/utils/urls.dart';
 
 class FirebaseNotificationManager {
   static var shared = FirebaseNotificationManager();
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static Future<void>? _initPluginFuture;
 
-  AndroidNotificationChannel channel = const AndroidNotificationChannel(
+  static const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'orange', // id
       AppRes.appName, // title
       playSound: true,
@@ -27,8 +29,32 @@ class FirebaseNotificationManager {
 
   String? notificationId;
 
+  static Future<void> _ensureLocalNotificationsReady() {
+    return _initPluginFuture ??= () async {
+      var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+
+      var initializationSettingsIOS = const DarwinInitializationSettings(
+          defaultPresentAlert: true, defaultPresentSound: true, defaultPresentBadge: false);
+
+      var initializationSettings =
+          InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+
+      await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
+
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+    }();
+  }
+
   void init() async {
-    subscribeToTopic();
+    await _ensureLocalNotificationsReady();
+
+    final user = SessionManager.instance.getUser();
+    if (user == null || user.isNotification == 1) {
+      subscribeToTopic();
+    }
+
     if (Platform.isAndroid) {
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
@@ -41,16 +67,6 @@ class FirebaseNotificationManager {
 
     await firebaseMessaging.requestPermission(alert: true, badge: false, sound: true);
 
-    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    var initializationSettingsIOS = const DarwinInitializationSettings(
-        defaultPresentAlert: true, defaultPresentSound: true, defaultPresentBadge: false);
-
-    var initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-
-    flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
-
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // If Notification has gone twice
       if (notificationId == message.messageId) return;
@@ -59,22 +75,23 @@ class FirebaseNotificationManager {
       if (message.data[Urls.aConversationId] == ChatScreenViewModel.conversationID) return;
       showNotification(message);
     });
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
   }
 
-  void showNotification(RemoteMessage message) {
+  static Future<void> showBackgroundNotification(RemoteMessage message) async {
+    await _ensureLocalNotificationsReady();
     int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
-    flutterLocalNotificationsPlugin.show(
+    await flutterLocalNotificationsPlugin.show(
       id: notificationId,
       title: message.data['title'] ?? message.notification?.title,
       body: message.data['body'] ?? message.notification?.body,
       notificationDetails: NotificationDetails(
           iOS: const DarwinNotificationDetails(presentSound: true, presentAlert: true, presentBadge: false),
-          android: AndroidNotificationDetails(channel.id, channel.name)),
+          android: AndroidNotificationDetails(channel.id, channel.name, importance: Importance.max, priority: Priority.high)),
     );
+  }
+
+  Future<void> showNotification(RemoteMessage message) {
+    return showBackgroundNotification(message);
   }
 
   void getNotificationToken(Function(String token) completion) async {

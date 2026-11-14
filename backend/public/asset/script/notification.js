@@ -41,7 +41,17 @@ $(document).ready(function () {
                     console.log(response);
 
                     if (response.status == false) {
-                        console.log(response.message);
+                        iziToast.show({
+                            title: `${app.Error}!`,
+                            message: response.message || "Notification failed to send.",
+                            color: app.redToast,
+                            position: app.toastPosition,
+                            transitionIn: app.transitionInAction,
+                            transitionOut: app.transitionOutAction,
+                            timeout: app.timeout,
+                            animateInside: false,
+                            iconUrl: app.cancleIcon,
+                        });
                     } else if (response.status == true) {
                         iziToast.show({
                             title: app.Success,
@@ -226,9 +236,9 @@ $(document).ready(function () {
                 processData: false,
                 success: function (response) {
                     console.log(response);
+                    button.removeClass("spinning");
+                    button.removeClass("disabled");
                     if (response.status == true) {
-                        button.removeClass("spinning");
-                        button.removeClass("disabled");
                         iziToast.show({
                             title: app.Success,
                             message: app.notificationSend,
@@ -239,6 +249,18 @@ $(document).ready(function () {
                             timeout: app.timeout,
                             animateInside: false,
                             iconUrl: app.checkCircleIcon,
+                        });
+                    } else {
+                        iziToast.show({
+                            title: `${app.Error}!`,
+                            message: response.message || "Notification failed to send.",
+                            color: app.redToast,
+                            position: app.toastPosition,
+                            transitionIn: app.transitionInAction,
+                            transitionOut: app.transitionOutAction,
+                            timeout: app.timeout,
+                            animateInside: false,
+                            iconUrl: app.cancleIcon,
                         });
                     }
                 },
