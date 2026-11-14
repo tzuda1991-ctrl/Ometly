@@ -15,10 +15,11 @@ WORKDIR /var/www/html
 COPY . .
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache/data storage/framework/sessions storage/framework/views storage/app/public \
+RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache/data storage/framework/sessions storage/framework/views storage/app/public/uploads \
     && rm -rf vendor bootstrap/cache/*.php bootstrap/cache/*.tmp \
-    && composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts \
-    && php artisan package:discover --ansi
+    && composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts
+
+RUN php artisan package:discover --ansi -vvv || (cat storage/logs/laravel.log 2>/dev/null || true; exit 1)
 
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\nAlias /public/storage /var/www/html/storage/app/public\n' >> /etc/apache2/sites-available/000-default.conf
