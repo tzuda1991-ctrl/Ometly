@@ -1,4 +1,4 @@
-package com.example.orange_ui
+package com.ometly.zu
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
@@ -13,13 +13,5 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handleMethod(call: MethodCall, result: MethodChannel.Result) {
-//        when(call.method) {
-//            "is_success_purchase" -> {
-//                // Do things...
-//                result.success(true)
-//                return
-//            }
-//            else -> result.notImplemented()
-//        }
     }
 }
