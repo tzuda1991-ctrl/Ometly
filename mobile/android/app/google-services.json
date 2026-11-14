@@ -12,7 +12,20 @@
           "package_name": "com.ometly.zu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "259381351107-aua422pis7o2motqlvco9i1ob6qiei04.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ometly.zu",
+            "certificate_hash": "5930caeb29b64c481b82126270dca82d8160da09"
+          }
+        },
+        {
+          "client_id": "259381351107-4q9as12ukcmh1144kcg2tkh9esdjrs36.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCJcvNVjCNg82GBYYpQhhHyrBWY2nR67YE"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259381351107-4q9as12ukcmh1144kcg2tkh9esdjrs36.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
