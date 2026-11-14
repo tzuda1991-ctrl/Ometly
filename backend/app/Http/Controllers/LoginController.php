@@ -53,7 +53,11 @@ class LoginController extends Controller
     }
     function login()
     {
-        Artisan::call('storage:link');
+        try {
+            Artisan::call('storage:link');
+        } catch (\Throwable $e) {
+            // Symlink already created in container entrypoint
+        }
 
         if (Session::get('user_name')) {
             return redirect('index');

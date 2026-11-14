@@ -79,7 +79,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="https" />
-                <data android:host="example.com" /> <!-- Custom host -->
+                <data android:host="ometly-production.up.railway.app" /> <!-- Custom host -->
             </intent-filter>
 
             <meta-data
