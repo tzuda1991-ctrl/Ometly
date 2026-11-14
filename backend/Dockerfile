@@ -23,7 +23,7 @@ RUN php artisan package:discover --ansi -vvv || (cat storage/logs/laravel.log 2>
 
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
-    && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\nAlias /public/storage /var/www/html/storage/app/public\n' >> /etc/apache2/sites-available/000-default.conf
+    && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n<Directory /var/www/html/storage/app/public>\n    Options +FollowSymLinks\n    AllowOverride None\n    Require all granted\n</Directory>\nAlias /public/storage /var/www/html/storage/app/public\nAlias /storage /var/www/html/storage/app/public\n' >> /etc/apache2/sites-available/000-default.conf
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
