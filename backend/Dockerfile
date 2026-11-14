@@ -15,7 +15,8 @@ WORKDIR /var/www/html
 COPY . .
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN rm -rf vendor bootstrap/cache/*.php bootstrap/cache/*.tmp \
+RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache/data storage/framework/sessions storage/framework/views storage/app/public \
+    && rm -rf vendor bootstrap/cache/*.php bootstrap/cache/*.tmp \
     && composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts \
     && php artisan package:discover --ansi
 
