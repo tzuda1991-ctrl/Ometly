@@ -5,6 +5,7 @@ mkdir -p /var/www/html/storage/app/public/uploads
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+rm -rf /var/www/html/public/storage
 php artisan storage:link || true
 
 if [ -n "$GOOGLE_CREDENTIALS_BASE64" ]; then

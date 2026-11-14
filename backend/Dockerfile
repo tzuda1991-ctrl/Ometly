@@ -22,8 +22,7 @@ RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache/data storage/f
 RUN php artisan package:discover --ansi -vvv || (cat storage/logs/laravel.log 2>/dev/null || true; exit 1)
 
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
-    && sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
-    && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n<Directory /var/www/html/storage/app/public>\n    Options +FollowSymLinks\n    AllowOverride None\n    Require all granted\n</Directory>\nAlias /public/storage /var/www/html/storage/app/public\nAlias /storage /var/www/html/storage/app/public\n' >> /etc/apache2/sites-available/000-default.conf
+    && printf '<VirtualHost *:80>\n    DocumentRoot /var/www/html/public\n    Alias /public/storage /var/www/html/storage/app/public\n    Alias /storage /var/www/html/storage/app/public\n    <Directory /var/www/html/public>\n        Options -Indexes +FollowSymLinks\n        AllowOverride All\n        Require all granted\n    </Directory>\n    <Directory /var/www/html/storage/app/public>\n        Options -Indexes +FollowSymLinks\n        AllowOverride None\n        Require all granted\n    </Directory>\n    ErrorLog ${APACHE_LOG_DIR}/error.log\n    CustomLog ${APACHE_LOG_DIR}/access.log combined\n</VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache

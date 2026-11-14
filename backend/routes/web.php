@@ -244,3 +244,15 @@ Route::get('viewTerms', [PagesController::class, 'viewTerms'])->middleware(['che
 Route::post('updateTerms', [PagesController::class, 'updateTerms'])->middleware(['checkLogin'])->name('updateTerms');
 Route::get('privacypolicy', [PagesController::class, 'privacypolicy'])->name('privacypolicy');
 Route::get('termsOfUse', [PagesController::class, 'termsOfUse'])->name('termsOfUse');
+
+$serveStorageFile = function ($path) {
+    $baseDir = realpath(storage_path('app/public'));
+    $target = realpath(storage_path('app/public/' . ltrim($path, '/')));
+    if (!$baseDir || !$target || strpos($target, $baseDir . DIRECTORY_SEPARATOR) !== 0 || !is_file($target)) {
+        abort(404);
+    }
+    return response()->file($target, ['Cache-Control' => 'public, max-age=86400']);
+};
+Route::get('public/storage/{path}', $serveStorageFile)->where('path', '.*');
+Route::get('storage/{path}', $serveStorageFile)->where('path', '.*');
+
