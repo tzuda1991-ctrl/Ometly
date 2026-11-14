@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
-include "./app/Class/AgoraDynamicKey/RtcTokenBuilder.php";
+include_once app_path('Class/AgoraDynamicKey/RtcTokenBuilder.php');
 
 class SettingController extends Controller
 {
