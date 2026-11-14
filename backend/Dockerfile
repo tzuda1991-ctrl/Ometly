@@ -14,8 +14,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-RUN rm -rf vendor \
-    && composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN rm -rf vendor bootstrap/cache/*.php bootstrap/cache/*.tmp \
+    && composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts \
+    && php artisan package:discover --ansi
 
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\nAlias /public/storage /var/www/html/storage/app/public\n' >> /etc/apache2/sites-available/000-default.conf
