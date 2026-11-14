@@ -1,0 +1,6 @@
+{
+  "name": "Orange Dating & Livestream Repo",
+  "description": "Railway-ready Laravel backend, MySQL schema, and GitHub Actions Flutter APK build workspace for Orange.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
