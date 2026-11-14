@@ -22,15 +22,28 @@ $(document).ready(function () {
                 } else {
                     iziToast.error({
                         title: `${app.Error}!`,
-                        message: "Login failed",
+                        message: response.message || "Login failed",
                         position: "topRight",
                     });
                 }
             },
             error: function (xhr) {
+                if (xhr.status === 419) {
+                    iziToast.warning({
+                        title: "Session Expired",
+                        message: "Refreshing page, please try again...",
+                        position: "topRight",
+                    });
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                    return;
+                }
                 iziToast.error({
                     title: `${app.Error}!`,
-                    message: "Something went wrong",
+                    message:
+                        (xhr.responseJSON && xhr.responseJSON.message) ||
+                        "Something went wrong",
                     position: "topRight",
                 });
             },
@@ -56,6 +69,9 @@ $(document).ready(function () {
             dataType: "json",
             contentType: false,
             processData: false,
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
             success: function (response) {
                 if (response.status) {
                     $("#forgotPasswordModal").modal("hide");
@@ -76,8 +92,15 @@ $(document).ready(function () {
                     showErrorToast(response.message);
                 }
             },
-            error: function (err) {
-                console.log(err);
+            error: function (xhr) {
+                if (xhr.status === 419) {
+                    window.location.reload();
+                    return;
+                }
+                showErrorToast(
+                    (xhr.responseJSON && xhr.responseJSON.message) ||
+                        "Something went wrong"
+                );
             },
         });
     });
